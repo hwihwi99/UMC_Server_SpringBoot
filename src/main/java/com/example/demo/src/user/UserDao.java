@@ -159,8 +159,8 @@ public class UserDao {
     // User 테이블에 존재하는 전체 유저들의 정보 조회
     public List<GetUserRes> getUsers() {
         String getUsersQuery = "select r1.userIdx, r1.userName, r1.address, r1.phoneNum, r1.nickname, r1.email, r1.password, r1.userImg, r1.totalscore, r2.content, r1.status\n" +
-                "from (select userName, address, phoneNum,email, userImg, userIdx,password,nickname,avg(score) as totalscore, User.status from User left join Review on User.userIdx = Review.user2 group by userIdx) as r1 \n" +
-                "left join Review r2 on r1.userIdx = r2.user2"; //User 테이블에 존재하는 모든 회원들의 정보를 조회하는 쿼리
+                "from (select userName, address, phoneNum,email, userImg, userIdx,password,nickname,avg(score) as totalscore, User.status from User left join Review on User.userIdx = Review.user2 group by userIdx) as r1\n" +
+                "left join Review r2 on r1.userIdx = r2.user2 where r1.status = 'active'"; //User 테이블에 존재하는 모든 회원들의 정보를 조회하는 쿼리
         return this.jdbcTemplate.query(getUsersQuery,
                 (rs, rowNum) -> new GetUserRes(
                         rs.getInt("userIdx"),
@@ -222,6 +222,12 @@ public class UserDao {
                         rs.getString("content"),
                         rs.getString("status")), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
                 getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
+    }
+
+    // 모든 활성화 되어있는 유저 수 구하기
+    public int countUser(){
+        String countUserQuery = "select count(*) as totalPage from User where status = 'active'";
+        return this.jdbcTemplate.queryForObject(countUserQuery,int.class);
     }
 
 }
