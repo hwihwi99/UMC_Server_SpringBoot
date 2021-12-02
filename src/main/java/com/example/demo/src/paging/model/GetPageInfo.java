@@ -1,4 +1,4 @@
-package com.example.demo.src.user.model;
+package com.example.demo.src.paging.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class GetUserCountRes {
+public class GetPageInfo {
     private int totalPage; // 전체 출력해야하는 게시글 수
     private int currentPage; // 꼭 출력을 원하는 게시글 수
     private int countList; // 한 면에 보여줄 수

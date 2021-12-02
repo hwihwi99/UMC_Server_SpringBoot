@@ -2,6 +2,7 @@ package com.example.demo.src.user;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.src.paging.Paging;
+import com.example.demo.src.paging.model.GetPageInfo;
 import com.example.demo.src.user.model.*;
 import com.example.demo.utils.AES128;
 import com.example.demo.utils.JwtService;
@@ -96,15 +97,15 @@ public class UserProvider {
     // User들의 정보를 조회
     public List<GetUserRes> getUsers() throws BaseException {
         try {
-            GetUserCountRes getUserCountRes = getTotalCount();
+            GetPageInfo getPageInfo = getTotalCount();
             List<GetUserRes> getUserRes = userDao.getUsers();
             List<GetUserRes> listUserRes = new ArrayList<>();
-            int currentPosition = (int)(Math.ceil(getUserCountRes.getCurrentPage() / getUserCountRes.getCountList())) ;
-            if(getUserCountRes.getCurrentPage() %3 != 0){
+            int currentPosition = (int)(Math.ceil(getPageInfo.getCurrentPage() / getPageInfo.getCountList())) ;
+            if(getPageInfo.getCurrentPage() %3 != 0){
                 currentPosition++;
             }
-            int s = (currentPosition-1) * getUserCountRes.getCountList() + 1;
-            int l = (currentPosition) * getUserCountRes.getCountList();
+            int s = (currentPosition-1) * getPageInfo.getCountList() + 1;
+            int l = (currentPosition) * getPageInfo.getCountList();
             for(int i = 0;i<getUserRes.size(); i++){
                 if(i>=s-1 && i<=l-1){
                     listUserRes.add(getUserRes.get(i));
@@ -139,11 +140,11 @@ public class UserProvider {
     }
 
     // 전체 사용자수 + 페이지 정보 받아오기
-    public GetUserCountRes getTotalCount(){
+    public GetPageInfo getTotalCount(){
         Paging paging = new Paging();
         int totalPage = userDao.countUser();
         paging.setTotalCount(totalPage);
-        GetUserCountRes getUserCountRes = new GetUserCountRes(totalPage,paging.getPage(),paging.getCountList(),paging.getStartPage(),paging.getEndPage(),paging.isPrev(),paging.isNext());
-        return getUserCountRes;
+        GetPageInfo getPageInfo = new GetPageInfo(totalPage,paging.getPage(),paging.getCountList(),paging.getStartPage(),paging.getEndPage(),paging.isPrev(),paging.isNext());
+        return getPageInfo;
     }
 }
