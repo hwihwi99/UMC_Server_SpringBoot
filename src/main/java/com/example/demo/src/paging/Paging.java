@@ -4,7 +4,7 @@ package com.example.demo.src.paging;
 
 public class Paging {
 
-    private int page=48; // 현재 게시글 번호
+    private int page=5; // 현재 게시글 번호
     private int totalCount; // 게시판 전체 게시글 개수
 
     private int countList = 3; // 게시판 화면에서 한번에 보여질 게시글 개수
@@ -32,7 +32,7 @@ public class Paging {
         if(totalCount % countList > 0){
             totalPage++;
         }
-
+        System.out.println(totalPage+"dfddd");
         if(totalCount < page){
             page = totalCount;
         }

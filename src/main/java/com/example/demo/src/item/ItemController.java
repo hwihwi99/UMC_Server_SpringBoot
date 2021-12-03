@@ -1,14 +1,17 @@
 package com.example.demo.src.item;
 
 import com.example.demo.config.BaseException;
+import com.example.demo.config.BasePageResponse;
 import com.example.demo.config.BaseResponse;
 import com.example.demo.src.item.model.*;
+import com.example.demo.src.paging.model.GetPageInfo;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.demo.config.BaseResponseStatus.INVALID_USER_JWT;
@@ -26,6 +29,9 @@ public class ItemController {
     @Autowired
     private final JwtService jwtService;
 
+
+    private int currentPosition,start,last;
+
     public ItemController(ItemProvider itemProvider, ItemService itemService, JwtService jwtService){
         this.itemProvider = itemProvider;
         this.itemService = itemService;
@@ -37,18 +43,38 @@ public class ItemController {
      * */
     @ResponseBody
     @GetMapping("/{userIdx}")
-    public BaseResponse<List<GetItemRes>> getItmes(@PathVariable("userIdx") int userIdx){
+    public BasePageResponse<GetPageInfo,List<GetItemRes>> getItmes(@PathVariable("userIdx") int userIdx){
         try{
+
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
             //userIdx와 접근한 유저가 같은지 확인
             if(userIdx != userIdxByJwt){
-                return new BaseResponse<>(INVALID_USER_JWT);
+                return new BasePageResponse<>(INVALID_USER_JWT);
             }
+
             List<GetItemRes> getItemRes = itemProvider.getItems(userIdx);
-            return new BaseResponse<>(getItemRes);
+            GetPageInfo getPageInfo = itemProvider.getPagingInfo(getItemRes.size());
+
+            List<GetItemRes> listItemRes = new ArrayList<>();
+
+            currentPosition = (int)(Math.ceil(getPageInfo.getCurrentPage() / getPageInfo.getCountList())) ;
+            if(getPageInfo.getCurrentPage() %3 != 0){
+                currentPosition++;
+            }
+            start = (currentPosition-1) * getPageInfo.getCountList() + 1;
+            last = (currentPosition) * getPageInfo.getCountList();
+
+
+            for(int i = 0;i<getItemRes.size(); i++){
+                if(i>=start-1 && i<=last-1){
+                    listItemRes.add(getItemRes.get(i));
+                }
+            }
+
+            return new BasePageResponse<>(getPageInfo,listItemRes);
         } catch(BaseException exception){
-            return new BaseResponse<>(exception.getStatus());
+            return new BasePageResponse<>(exception.getStatus());
         }
     }
 
@@ -84,92 +110,181 @@ public class ItemController {
 
     @ResponseBody
     @GetMapping("/before/{nickname}")
-    public BaseResponse<List<GetItemRes>> beforeItem(@PathVariable("nickname") String nickname){
+    public BasePageResponse<GetPageInfo,List<GetItemRes>> beforeItem(@PathVariable("nickname") String nickname){
         try{
 
             String userNicknameByJwt = jwtService.getNickname();
-            System.out.println(userNicknameByJwt);
-            System.out.println(nickname);
             if(!nickname.equals(userNicknameByJwt)){
-                return new BaseResponse<>(INVALID_USER_JWT);
+                return new BasePageResponse<>(INVALID_USER_JWT);
             }
 
             List<GetItemRes> beforeItem = itemProvider.getBeforeItem(nickname);
-            return new BaseResponse<>(beforeItem);
+
+            GetPageInfo getPageInfo = itemProvider.getPagingInfo(beforeItem.size());
+
+            List<GetItemRes> listShow = new ArrayList<>();
+
+            currentPosition = (int)(Math.ceil(getPageInfo.getCurrentPage() / getPageInfo.getCountList())) ;
+            if(getPageInfo.getCurrentPage() %3 != 0){
+                currentPosition++;
+            }
+            start = (currentPosition-1) * getPageInfo.getCountList() + 1;
+            last = (currentPosition) * getPageInfo.getCountList();
+
+            for(int i = 0;i<beforeItem.size(); i++){
+                if(i>=start-1 && i<=last-1){
+                    System.out.println(1);
+                    listShow.add(beforeItem.get(i));
+                }
+            }
+
+            return new BasePageResponse<>(getPageInfo,listShow);
         } catch (BaseException exception){
-            return new BaseResponse<>((exception.getStatus()));
+            return new BasePageResponse<>((exception.getStatus()));
         }
     }
 
     @ResponseBody
     @GetMapping("/complete/{nickname}")
-    public BaseResponse<List<GetItemRes>> completeItem(@PathVariable("nickname") String nickname){
+    public BasePageResponse<GetPageInfo,List<GetItemRes>> completeItem(@PathVariable("nickname") String nickname){
         try{
 
             String userNicknameByJwt = jwtService.getNickname();
             System.out.println(userNicknameByJwt);
             if(!nickname.equals(userNicknameByJwt)){
-                return new BaseResponse<>(INVALID_USER_JWT);
+                return new BasePageResponse<>(INVALID_USER_JWT);
             }
 
             List<GetItemRes> completeItem = itemProvider.getCompleteItem(nickname);
-            return new BaseResponse<>(completeItem);
+            GetPageInfo getPageInfo = itemProvider.getPagingInfo(completeItem.size());
+
+            List<GetItemRes> listShow = new ArrayList<>();
+
+            currentPosition = (int)(Math.ceil(getPageInfo.getCurrentPage() / getPageInfo.getCountList())) ;
+            if(getPageInfo.getCurrentPage() %3 != 0){
+                currentPosition++;
+            }
+            start = (currentPosition-1) * getPageInfo.getCountList() + 1;
+            last = (currentPosition) * getPageInfo.getCountList();
+
+            for(int i = 0;i<completeItem.size(); i++){
+                if(i>=start-1 && i<=last-1){
+                    System.out.println(1);
+                    listShow.add(completeItem.get(i));
+                }
+            }
+
+            return new BasePageResponse<>(getPageInfo,completeItem);
         } catch (BaseException exception){
-            return new BaseResponse<>((exception.getStatus()));
+            return new BasePageResponse<>((exception.getStatus()));
         }
     }
 
     @ResponseBody
     @GetMapping("/hide/{nickname}")
-    public BaseResponse<List<GetItemRes>> hideItem(@PathVariable("nickname") String nickname){
+    public BasePageResponse<GetPageInfo,List<GetItemRes>> hideItem(@PathVariable("nickname") String nickname){
         try{
 
             String userNicknameByJwt = jwtService.getNickname();
             System.out.println(userNicknameByJwt);
             if(!nickname.equals(userNicknameByJwt)){
-                return new BaseResponse<>(INVALID_USER_JWT);
+                return new BasePageResponse<>(INVALID_USER_JWT);
             }
 
             List<GetItemRes> hideItem = itemProvider.getHideItem(nickname);
-            return new BaseResponse<>(hideItem);
+
+            GetPageInfo getPageInfo = itemProvider.getPagingInfo(hideItem.size());
+
+            List<GetItemRes> listShow = new ArrayList<>();
+
+            currentPosition = (int)(Math.ceil(getPageInfo.getCurrentPage() / getPageInfo.getCountList())) ;
+            if(getPageInfo.getCurrentPage() %3 != 0){
+                currentPosition++;
+            }
+            start = (currentPosition-1) * getPageInfo.getCountList() + 1;
+            last = (currentPosition) * getPageInfo.getCountList();
+
+            for(int i = 0;i<hideItem.size(); i++){
+                if(i>=start-1 && i<=last-1){
+                    System.out.println(1);
+                    listShow.add(hideItem.get(i));
+                }
+            }
+            return new BasePageResponse<>(getPageInfo,hideItem);
         } catch (BaseException exception){
-            return new BaseResponse<>((exception.getStatus()));
+            return new BasePageResponse<>((exception.getStatus()));
         }
     }
 
     @ResponseBody
     @GetMapping("/purchase/{nickname}")
-    public BaseResponse<List<GetPurItemRes>> purchaseItem(@PathVariable("nickname") String nickname){
+    public BasePageResponse<GetPageInfo,List<GetPurItemRes>> purchaseItem(@PathVariable("nickname") String nickname){
         try{
 
             String userNicknameByJwt = jwtService.getNickname();
             System.out.println(userNicknameByJwt);
             if(!nickname.equals(userNicknameByJwt)){
-                return new BaseResponse<>(INVALID_USER_JWT);
+                return new BasePageResponse<>(INVALID_USER_JWT);
             }
 
             List<GetPurItemRes> purchaseItem = itemProvider.getPurchaseItems(nickname);
-            return new BaseResponse<>(purchaseItem);
+
+            GetPageInfo getPageInfo = itemProvider.getPagingInfo(purchaseItem.size());
+
+            List<GetPurItemRes> listShow = new ArrayList<>();
+
+            currentPosition = (int)(Math.ceil(getPageInfo.getCurrentPage() / getPageInfo.getCountList())) ;
+            if(getPageInfo.getCurrentPage() %3 != 0){
+                currentPosition++;
+            }
+            start = (currentPosition-1) * getPageInfo.getCountList() + 1;
+            last = (currentPosition) * getPageInfo.getCountList();
+
+            for(int i = 0;i<purchaseItem.size(); i++){
+                if(i>=start-1 && i<=last-1){
+                    listShow.add(purchaseItem.get(i));
+                }
+            }
+
+            return new BasePageResponse<>(getPageInfo,purchaseItem);
         } catch (BaseException exception){
-            return new BaseResponse<>((exception.getStatus()));
+            return new BasePageResponse<>((exception.getStatus()));
         }
     }
 
     @ResponseBody
     @GetMapping("/watchlist/{nickname}")
-    public BaseResponse<List<GetPurItemRes>> watchListItem(@PathVariable("nickname") String nickname){
+    public BasePageResponse<GetPageInfo,List<GetPurItemRes>> watchListItem(@PathVariable("nickname") String nickname){
         try{
 
             String userNicknameByJwt = jwtService.getNickname();
             System.out.println(userNicknameByJwt);
             if(!nickname.equals(userNicknameByJwt)){
-                return new BaseResponse<>(INVALID_USER_JWT);
+                return new BasePageResponse<>(INVALID_USER_JWT);
             }
 
             List<GetPurItemRes> watchListItem = itemProvider.watchListItmes(nickname);
-            return new BaseResponse<>(watchListItem);
+            GetPageInfo getPageInfo = itemProvider.getPagingInfo(watchListItem.size());
+
+            List<GetPurItemRes> listShow = new ArrayList<>();
+
+            currentPosition = (int)(Math.ceil(getPageInfo.getCurrentPage() / getPageInfo.getCountList())) ;
+            if(getPageInfo.getCurrentPage() %3 != 0){
+                currentPosition++;
+            }
+            start = (currentPosition-1) * getPageInfo.getCountList() + 1;
+            last = (currentPosition) * getPageInfo.getCountList();
+
+            for(int i = 0;i<watchListItem.size(); i++){
+                if(i>=start-1 && i<=last-1){
+                    System.out.println(1);
+                    listShow.add(watchListItem.get(i));
+                }
+            }
+
+            return new BasePageResponse<>(getPageInfo,watchListItem);
         } catch (BaseException exception){
-            return new BaseResponse<>((exception.getStatus()));
+            return new BasePageResponse<>((exception.getStatus()));
         }
     }
 

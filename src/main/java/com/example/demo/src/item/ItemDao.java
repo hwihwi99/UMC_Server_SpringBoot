@@ -1,9 +1,6 @@
 package com.example.demo.src.item;
 
-import com.example.demo.src.item.model.GetItemDetailRes;
-import com.example.demo.src.item.model.GetItemRes;
-import com.example.demo.src.item.model.GetPurItemRes;
-import com.example.demo.src.item.model.PostNewItemReq;
+import com.example.demo.src.item.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;

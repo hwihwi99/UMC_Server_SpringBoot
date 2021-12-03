@@ -113,7 +113,6 @@ public class UserProvider {
             }
             return listUserRes;
         } catch (Exception exception) {
-            System.out.println(123456);
             throw new BaseException(DATABASE_ERROR);
         }
     }

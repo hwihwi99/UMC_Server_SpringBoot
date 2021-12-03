@@ -4,12 +4,15 @@ import com.example.demo.config.BaseException;
 import com.example.demo.src.item.model.GetItemDetailRes;
 import com.example.demo.src.item.model.GetItemRes;
 import com.example.demo.src.item.model.GetPurItemRes;
+import com.example.demo.src.paging.Paging;
+import com.example.demo.src.paging.model.GetPageInfo;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.demo.config.BaseResponseStatus.DATABASE_ERROR;
@@ -31,7 +34,10 @@ public class ItemProvider {
     // 해당 userIdx를 갖는 Item의 정보 조회
     public List<GetItemRes> getItems(int userIdx) throws BaseException{
         try{
+            //GetPageInfo getPageInfo = getPagingInfo();
             List<GetItemRes> getItemRes = itemDao.getItems(userIdx);
+            //getPageInfo.setTotalPage(getItemRes.size());
+
             return getItemRes;
         } catch (Exception exception){
             throw new BaseException(DATABASE_ERROR);
@@ -96,4 +102,15 @@ public class ItemProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    // 사용자 주소별 전체 상품 목록 + 페이지 정보 받아오기
+    public GetPageInfo getPagingInfo(int total){
+        Paging paging = new Paging();
+        paging.setTotalCount(total);
+        GetPageInfo getPageInfo = new GetPageInfo(paging.getTotalPage(), paging.getPage(),paging.getCountList(),paging.getStartPage(),paging.getEndPage(),paging.isPrev(),paging.isNext());
+        return getPageInfo;
+    }
+
+
+
 }
