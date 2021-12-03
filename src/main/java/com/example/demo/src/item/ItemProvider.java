@@ -102,15 +102,4 @@ public class ItemProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
-
-    // 사용자 주소별 전체 상품 목록 + 페이지 정보 받아오기
-    public GetPageInfo getPagingInfo(int total){
-        Paging paging = new Paging();
-        paging.setTotalCount(total);
-        GetPageInfo getPageInfo = new GetPageInfo(paging.getTotalPage(), paging.getPage(),paging.getCountList(),paging.getStartPage(),paging.getEndPage(),paging.isPrev(),paging.isNext());
-        return getPageInfo;
-    }
-
-
-
 }

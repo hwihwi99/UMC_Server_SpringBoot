@@ -4,6 +4,7 @@ import com.example.demo.config.BaseException;
 import com.example.demo.config.BasePageResponse;
 import com.example.demo.config.BaseResponse;
 import com.example.demo.src.item.model.*;
+import com.example.demo.src.paging.PageProvider;
 import com.example.demo.src.paging.model.GetPageInfo;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
@@ -28,14 +29,16 @@ public class ItemController {
     private final ItemService itemService;
     @Autowired
     private final JwtService jwtService;
-
+    @Autowired
+    private final PageProvider pageProvider;
 
     private int currentPosition,start,last;
 
-    public ItemController(ItemProvider itemProvider, ItemService itemService, JwtService jwtService){
+    public ItemController(ItemProvider itemProvider, ItemService itemService, JwtService jwtService, PageProvider pageProvider){
         this.itemProvider = itemProvider;
         this.itemService = itemService;
         this.jwtService = jwtService;
+        this.pageProvider = pageProvider;
     }
 
     /**
@@ -54,7 +57,7 @@ public class ItemController {
             }
 
             List<GetItemRes> getItemRes = itemProvider.getItems(userIdx);
-            GetPageInfo getPageInfo = itemProvider.getPagingInfo(getItemRes.size());
+            GetPageInfo getPageInfo = pageProvider.getPagingInfo(getItemRes.size());
 
             List<GetItemRes> listItemRes = new ArrayList<>();
 
@@ -120,7 +123,7 @@ public class ItemController {
 
             List<GetItemRes> beforeItem = itemProvider.getBeforeItem(nickname);
 
-            GetPageInfo getPageInfo = itemProvider.getPagingInfo(beforeItem.size());
+            GetPageInfo getPageInfo = pageProvider.getPagingInfo(beforeItem.size());
 
             List<GetItemRes> listShow = new ArrayList<>();
 
@@ -150,13 +153,12 @@ public class ItemController {
         try{
 
             String userNicknameByJwt = jwtService.getNickname();
-            System.out.println(userNicknameByJwt);
             if(!nickname.equals(userNicknameByJwt)){
                 return new BasePageResponse<>(INVALID_USER_JWT);
             }
 
             List<GetItemRes> completeItem = itemProvider.getCompleteItem(nickname);
-            GetPageInfo getPageInfo = itemProvider.getPagingInfo(completeItem.size());
+            GetPageInfo getPageInfo = pageProvider.getPagingInfo(completeItem.size());
 
             List<GetItemRes> listShow = new ArrayList<>();
 
@@ -186,14 +188,13 @@ public class ItemController {
         try{
 
             String userNicknameByJwt = jwtService.getNickname();
-            System.out.println(userNicknameByJwt);
             if(!nickname.equals(userNicknameByJwt)){
                 return new BasePageResponse<>(INVALID_USER_JWT);
             }
 
             List<GetItemRes> hideItem = itemProvider.getHideItem(nickname);
 
-            GetPageInfo getPageInfo = itemProvider.getPagingInfo(hideItem.size());
+            GetPageInfo getPageInfo = pageProvider.getPagingInfo(hideItem.size());
 
             List<GetItemRes> listShow = new ArrayList<>();
 
@@ -222,14 +223,13 @@ public class ItemController {
         try{
 
             String userNicknameByJwt = jwtService.getNickname();
-            System.out.println(userNicknameByJwt);
             if(!nickname.equals(userNicknameByJwt)){
                 return new BasePageResponse<>(INVALID_USER_JWT);
             }
 
             List<GetPurItemRes> purchaseItem = itemProvider.getPurchaseItems(nickname);
 
-            GetPageInfo getPageInfo = itemProvider.getPagingInfo(purchaseItem.size());
+            GetPageInfo getPageInfo = pageProvider.getPagingInfo(purchaseItem.size());
 
             List<GetPurItemRes> listShow = new ArrayList<>();
 
@@ -258,13 +258,12 @@ public class ItemController {
         try{
 
             String userNicknameByJwt = jwtService.getNickname();
-            System.out.println(userNicknameByJwt);
             if(!nickname.equals(userNicknameByJwt)){
                 return new BasePageResponse<>(INVALID_USER_JWT);
             }
 
             List<GetPurItemRes> watchListItem = itemProvider.watchListItmes(nickname);
-            GetPageInfo getPageInfo = itemProvider.getPagingInfo(watchListItem.size());
+            GetPageInfo getPageInfo = pageProvider.getPagingInfo(watchListItem.size());
 
             List<GetPurItemRes> listShow = new ArrayList<>();
 
@@ -277,7 +276,6 @@ public class ItemController {
 
             for(int i = 0;i<watchListItem.size(); i++){
                 if(i>=start-1 && i<=last-1){
-                    System.out.println(1);
                     listShow.add(watchListItem.get(i));
                 }
             }
